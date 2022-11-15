@@ -119,5 +119,72 @@ class Post {
         return false;
 
     }
+
+    //Update a post
+    public function update() {
+        // Create a query for updating a post
+        $query = "UPDATE 
+                $this->table 
+            SET 
+                title = :title,
+                author = :author,
+                body = :body,
+                category_id = :category_id
+            WHERE 
+                id = :id
+            LIMIT 
+                1";
+
+        //Prepare the query.
+        $stmt = $this->conn->prepare($query);
+
+        //Clean the data pass by the user.
+        $this->title = htmlspecialchars(strip_tags($this->title));
+        $this->author = htmlspecialchars(strip_tags($this->author));
+        $this->body = htmlspecialchars(strip_tags($this->body));
+        $this->category_id = htmlspecialchars(strip_tags($this->category_id));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        //Bind the data to our name parameters.
+        $stmt->bindParam(':title', $this->title);
+        $stmt->bindParam(':author', $this->author);
+        $stmt->bindParam(':body', $this->body);
+        $stmt->bindParam(':category_id', $this->category_id);
+        $stmt->bindParam(':id', $this->id);
+
+
+        //Execute the query.
+        if($stmt->execute()){
+            return true;    
+        }
+
+        //Print error if something went wrong.
+        printf("ERROR: %s.\n", $stmt->error);
+        return false;
+    }
+
+    // Delete a Post
+    public function destroy() {
+        // Create a query for deleting a post.
+        $query = "DELETE FROM $this->table WHERE id = ? LIMIT 1";
+
+        // Prepare the query.
+        $stmt = $this->conn->prepare($query);
+
+        // Clean the data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        // Bind the parameters
+        $stmt->bindParam(1, $this->id);
+
+        //Execute the query.
+        if($stmt->execute()){
+            return true;    
+        }
+
+        //Print error if something went wrong.
+        printf("ERROR: %s.\n", $stmt->error);
+        return false;
+    }
     
 }
